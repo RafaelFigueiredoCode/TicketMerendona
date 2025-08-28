@@ -5,6 +5,9 @@ import axios from 'axios';
 import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "../features/GlobalSave";
 import CustomInput from '../components/CustomInput'
+import users from '../Users/users';
+import { sha256 } from "js-sha256";
+
 
 export default function LoginScreen({navigation})  {
     const [matricula, setMatricula] = useState('')
@@ -13,20 +16,30 @@ export default function LoginScreen({navigation})  {
 
     const { isAuthenticated } = useSelector((state) => state.auth)
 
+
     const handleLogin = () => {
-        if (matricula === "" || password === "") {
-          Alert.alert("Erro", "Preencha todos os campos!");
+
+        const hashedInput = sha256(password)
+
+        const found = users.find(
+          (u) => u.matricula === matricula && u.senha === hashedInput
+          
+        );
+      
+        if (!found) {
+          Alert.alert("Erro", "Matrícula ou senha incorreta");
           return;
         }
-
-    const fakeUser = { id: 1, name: "Rafael", matricula };
-    const fakeToken = "123abc";
-    
-    dispatch(loginSuccess({ user: fakeUser, token: fakeToken }));
-
-    navigation.replace("Home");
-
-    }
+      
+        dispatch(
+          loginSuccess({
+            user: { id: found.id, name: found.name, matricula: found.matricula, role: found.role },
+            token: "123abc"
+          })
+        );
+      
+        navigation.replace("Home");
+      };
 
       return(
         <View style={styles.container}>

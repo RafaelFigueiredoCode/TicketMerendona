@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import * as Location from 'expo-location';
 
-const App = () => {
+export default function TicketScreen () {
   const [ticketReceived, setTicketReceived] = useState(false);
   const [isInAllowedRegion, setIsInAllowedRegion] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -24,7 +24,7 @@ const App = () => {
     const minutes = now.getMinutes();
     
     // Supondo que o intervalo seja às 12:00
-    return hours === 11 && minutes >= 55;
+    return hours === 10 && minutes >= 44;
   };
 
   // Simula a verificação de localização
@@ -223,4 +223,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
