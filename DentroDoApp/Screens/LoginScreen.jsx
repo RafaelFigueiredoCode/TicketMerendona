@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, FlatList, ActivityIndicator, TextInput, Alert} from 'react-native';
+import { StyleSheet, View, Text, FlatList, ActivityIndicator, Alert} from 'react-native';
 import { useState, useEffect } from 'react';
 import CustomButton from '../components/CustomButton';
 import axios from 'axios';
@@ -32,7 +32,7 @@ export default function LoginScreen({navigation})  {
         <View style={styles.container}>
         <Text style={styles.title}>Login</Text>
   
-        <TextInput
+        <CustomInput
           style={styles.input}
           placeholder="Matricula"
           value={matricula}
