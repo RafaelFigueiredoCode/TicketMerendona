@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "../features/GlobalSave";
 import CustomInput from '../components/CustomInput'
 import users from '../Users/users';
-import { sha256 } from "js-sha256";
+import bcrypt from "bcryptjs";
 
 
 export default function LoginScreen({navigation})  {
@@ -18,28 +18,37 @@ export default function LoginScreen({navigation})  {
 
 
     const handleLogin = () => {
-
-        const hashedInput = sha256(password)
-
-        const found = users.find(
-          (u) => u.matricula === matricula && u.senha === hashedInput
-          
-        );
-      
-        if (!found) {
-          Alert.alert("Erro", "Matrícula ou senha incorreta");
-          return;
-        }
-      
-        dispatch(
-          loginSuccess({
-            user: { id: found.id, name: found.name, matricula: found.matricula, role: found.role },
-            token: "123abc"
-          })
-        );
-      
+      const found = users.find((u) => u.matricula === matricula);
+    
+      if (!found) {
+        Alert.alert("Erro", "Matrícula ou senha incorreta");
+        return;
+      }
+    
+      const isMatch = bcrypt.compareSync(password, found.senha);
+    
+      if (!isMatch) {
+        Alert.alert("Erro", "Matrícula ou senha incorreta");
+        return;
+      }
+    
+      dispatch(
+        loginSuccess({
+          user: {
+            id: found.id,
+            name: found.name,
+            matricula: found.matricula,
+            role: found.role
+          },
+          token: "123abc"
+        })
+      );
+      if (found.role === "admin") {
+        navigation.replace("AdminHome");
+      } else {
         navigation.replace("Home");
-      };
+      }
+    };
 
       return(
         <View style={styles.container}>
