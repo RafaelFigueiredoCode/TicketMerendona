@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react
 import * as Location from 'expo-location';
 import CustomButton from '../components/CustomButton';
 
-export default function TicketScreen () {
+export default function TicketScreen ({navigation}) {
   const [ticketReceived, setTicketReceived] = useState(false);
   const [isInAllowedRegion, setIsInAllowedRegion] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -129,7 +129,7 @@ export default function TicketScreen () {
         </Text>
       </View>
 
-      <Text style={styles.title}>---------Outras Telas----------</Text>
+      <Text style={styles.titleScreens}>---------Outras Telas----------</Text>
       <CustomButton 
       title = 'Validar Ticket'
       style= {styles.validationButton}
@@ -137,6 +137,7 @@ export default function TicketScreen () {
       <CustomButton 
       title = 'Ver Intervalo'
       style= {styles.intervaloButton}
+      onPress={() => navigation.navigate("Interval")}
       />
       <CustomButton 
       title = 'Ver Localização'
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFE4E1',
     padding: 20,
   },
   title: {
@@ -160,6 +161,11 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     textAlign: 'center',
     color: '#333',
+  },
+  titleScreens: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   statusContainer: {
     flexDirection: 'row',
@@ -198,7 +204,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
     padding: 15,
     borderRadius: 8,
-    
     width: '80%',
     alignItems: 'center',
   },

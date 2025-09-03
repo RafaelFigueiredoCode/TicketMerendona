@@ -12,7 +12,7 @@ const salt = bcrypt.genSaltSync(10);
 
 export default [
   {
-    matricula: "744939473",
+    matricula: "123",
     senha: bcrypt.hashSync("2134", salt),
     name: "Rafael",
     role: "user"

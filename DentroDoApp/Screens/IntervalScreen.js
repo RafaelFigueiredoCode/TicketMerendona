@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import CustomButton from '../components/CustomButton';
 
-const IntervalScreen = () => {
+const IntervalScreen = ({navigation}) => {
   // Horários de exemplo (pode ser ajustado ou vindo de um estado global)
   const INTERVAL_START = { hour: 12, minute: 0 }; // 12:00
   const INTERVAL_END = { hour: 13, minute: 0 };   // 13:00
@@ -54,6 +55,7 @@ const IntervalScreen = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.containerText}>
       <Text style={styles.title}>Controle de Intervalo</Text>
       
       <Text style={styles.status}>
@@ -64,6 +66,23 @@ const IntervalScreen = () => {
         {isActive ? 'Tempo para terminar: ' : 'Tempo para iniciar: '}
         {timeLeft}
       </Text>
+      </View>
+
+      <Text style={styles.titleScreens}>---------Outras Telas----------</Text>
+      <CustomButton 
+      title = 'Validar Ticket'
+      style= {styles.validationButton}
+      />
+      <CustomButton 
+      title = 'Ver Intervalo'
+      style= {styles.intervaloButton}
+      
+      />
+      <CustomButton 
+      title = 'Voltar para Tela Inicial'
+      style= {styles.localizationButton}
+      onPress={() => navigation.navigate("Home")}
+       />
     </View>
   );
 };
@@ -73,19 +92,57 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 	'#FFE4E1',
+  },
+  containerText: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 	'#E9967A',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 50,
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  titleScreens: {
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
   },
   status: {
-    fontSize: 18,
+    fontSize: 22,
     marginBottom: 10,
   },
   time: {
-    fontSize: 16,
+    fontSize: 20,
+    marginBottom: 20,
+  },
+  validationButton: {
+    backgroundColor: '#000',
+    padding: 15,
+    marginBottom: 15,
+    borderRadius: 8,
+    width: '80%',
+    alignItems: 'center',
+  },
+  intervaloButton: {
+    backgroundColor: '#800000',
+    padding: 15,
+    marginBottom: 15,
+    borderRadius: 8,
+    width: '80%',
+    alignItems: 'center',
+  },
+  localizationButton: {
+    backgroundColor: '#00008B',
+    padding: 15,
+    marginBottom: 15,
+    borderRadius: 8,
+    width: '80%',
+    alignItems: 'center',
   },
 });
 
