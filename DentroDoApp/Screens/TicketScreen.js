@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import * as Location from 'expo-location';
+import CustomButton from '../components/CustomButton';
 
 export default function TicketScreen () {
   const [ticketReceived, setTicketReceived] = useState(false);
@@ -24,7 +25,7 @@ export default function TicketScreen () {
     const minutes = now.getMinutes();
     
     // Supondo que o intervalo seja às 12:00
-    return hours === 10 && minutes >= 44;
+    return hours === 8 && minutes >= 26;
   };
 
   // Simula a verificação de localização
@@ -102,26 +103,20 @@ export default function TicketScreen () {
         </Text>
       </View>
 
-      <TouchableOpacity 
+      <CustomButton
+        title= {isInAllowedRegion ? '✅ Na Escola' : 'Verificar Localização'}
         style={[styles.locationButton, isInAllowedRegion && styles.locationVerified]}
         onPress={checkLocation}
-      >
-        <Text style={styles.buttonText}>
-          {isInAllowedRegion ? '✅ Na Escola' : 'Verificar Localização'}
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity 
+      />
+      <CustomButton
+        title= 'Receber Ticket'
         style={[
           styles.receiveButton, 
           (!isWithinAllowedTime() || ticketReceived || !isInAllowedRegion) && styles.buttonDisabled
         ]}
         onPress={receiveTicket}
         disabled={!isWithinAllowedTime() || ticketReceived || !isInAllowedRegion}
-      >
-        <Text style={styles.buttonText}>Receber Ticket</Text>
-      </TouchableOpacity>
-
+      />
       <View style={styles.infoContainer}>
         <Text style={styles.infoText}>
           • Apenas 1 ticket por dia por aluno
@@ -133,6 +128,20 @@ export default function TicketScreen () {
           • É necessário estar na escola
         </Text>
       </View>
+
+      <Text style={styles.title}>---------Outras Telas----------</Text>
+      <CustomButton 
+      title = 'Validar Ticket'
+      style= {styles.validationButton}
+      />
+      <CustomButton 
+      title = 'Ver Intervalo'
+      style= {styles.intervaloButton}
+      />
+      <CustomButton 
+      title = 'Ver Localização'
+      style= {styles.localizationButton}
+      />
     </View>
   );
 };
@@ -189,7 +198,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
     padding: 15,
     borderRadius: 8,
-    marginBottom: 20,
+    
     width: '80%',
     alignItems: 'center',
   },
@@ -200,19 +209,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
     padding: 15,
     borderRadius: 8,
-    marginBottom: 30,
+    marginBottom: 15,
     width: '80%',
     alignItems: 'center',
   },
   buttonDisabled: {
     backgroundColor: '#BDBDBD',
   },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   infoContainer: {
+    marginBottom: 30,
     marginTop: 20,
     width: '80%',
   },
@@ -220,6 +225,30 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 8,
     color: '#666',
+  },
+  validationButton: {
+    backgroundColor: '#000',
+    padding: 15,
+    marginBottom: 15,
+    borderRadius: 8,
+    width: '80%',
+    alignItems: 'center',
+  },
+  intervaloButton: {
+    backgroundColor: '#800000',
+    padding: 15,
+    marginBottom: 15,
+    borderRadius: 8,
+    width: '80%',
+    alignItems: 'center',
+  },
+  localizationButton: {
+    backgroundColor: '#00008B',
+    padding: 15,
+    marginBottom: 15,
+    borderRadius: 8,
+    width: '80%',
+    alignItems: 'center',
   },
 });
 
