@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 
-// Fallback obrigatório no React Native Hermes
 bcrypt.setRandomFallback((len) => {
   const arr = new Uint8Array(len);
   for (let i = 0; i < len; i++) {
@@ -13,8 +12,8 @@ const salt = bcrypt.genSaltSync(10);
 
 export default [
   {
-    matricula: "123",
-    senha: bcrypt.hashSync("123", salt),
+    matricula: "744939473",
+    senha: bcrypt.hashSync("2134", salt),
     name: "Rafael",
     role: "user"
   },

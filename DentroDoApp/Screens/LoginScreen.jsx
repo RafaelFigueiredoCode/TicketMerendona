@@ -43,8 +43,11 @@ export default function LoginScreen({navigation})  {
           token: "123abc"
         })
       );
-    
-      navigation.replace("Home");
+      if (found.role === "admin") {
+        navigation.replace("AdminHome");
+      } else {
+        navigation.replace("Home");
+      }
     };
 
       return(
