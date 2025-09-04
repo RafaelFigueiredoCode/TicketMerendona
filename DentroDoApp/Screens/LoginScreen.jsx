@@ -34,13 +34,12 @@ export default function LoginScreen({ navigation }) {
     dispatch(
       loginSuccess({
         aluno: {
-          nome: found.name,
+          id: found.id,
+          nome: found.nome || found.name, // pega nome do aluno ou do usuário fixo
           matricula: found.matricula,
-          role: "aluno", 
+          role: found.role || "aluno",
         },
-        token: "123abc",
-      })
-    );
+      }))
 
     // redirecionamento
     if (found.role === "admin") {

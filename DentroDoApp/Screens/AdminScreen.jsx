@@ -18,8 +18,7 @@ export default function AdminScreen() {
   const [resultado, setResultado] = useState(null);
   const alunos = useSelector((state) => state.alunos.alunos);
 
-  // Cadastrar aluno
-  const handleAdicionar = () => {
+  const handleAdicionar = async () => {
     if (!nome || !matricula || !senha || !cpf) {
       alert("Todos os campos são obrigatórios!");
       return;
@@ -38,14 +37,17 @@ export default function AdminScreen() {
     };
   
     dispatch(adicionarAluno(novoAluno));
-    dispatch(saveAlunos([...alunos, novoAluno])); // salva no AsyncStorage
+  
+    // Pega o estado atualizado após dispatch
+    const updatedAlunos = [...alunos, novoAluno];
+    await dispatch(saveAlunos(updatedAlunos));
   
     setNome("");
     setMatricula("");
     setCpf("");
     setSenha("");
   };
-
+  
   const handlePesquisar = () => {
     const aluno = alunos.find((a) => a.matricula === matriculaFind);
     setResultado(aluno || null);
