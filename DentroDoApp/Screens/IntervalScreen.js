@@ -4,8 +4,8 @@ import CustomButton from '../components/CustomButton';
 
 const IntervalScreen = ({navigation}) => {
   // Horários de exemplo (pode ser ajustado ou vindo de um estado global)
-  const INTERVAL_START = { hour: 12, minute: 0 }; // 12:00
-  const INTERVAL_END = { hour: 13, minute: 0 };   // 13:00
+  const INTERVAL_START = { hour: 9, minute: 20 };
+  const INTERVAL_END = { hour: 9, minute: 35 };
 
   const [timeLeft, setTimeLeft] = useState('');
   const [isActive, setIsActive] = useState(false);
@@ -74,7 +74,7 @@ const IntervalScreen = ({navigation}) => {
       style= {styles.validationButton}
       />
       <CustomButton 
-      title = 'Ver Intervalo'
+      title = 'Ver Localização'
       style= {styles.intervaloButton}
       
       />

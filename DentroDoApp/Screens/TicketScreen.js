@@ -25,7 +25,7 @@ export default function TicketScreen ({navigation}) {
     const minutes = now.getMinutes();
     
     // Supondo que o intervalo seja às 12:00
-    return hours === 8 && minutes >= 26;
+    return hours === 8 && minutes >= 30;
   };
 
   // Simula a verificação de localização

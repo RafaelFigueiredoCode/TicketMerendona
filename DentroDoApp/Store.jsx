@@ -4,6 +4,7 @@ import { persistStore, persistReducer } from "redux-persist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import authReducer from "./features/GlobalSave";
 import counterReducer from './features/counterSlice';
+import alunoReducer from './features/AlunosSlice'
 
 const persistConfig = {
   key: "root",
@@ -16,6 +17,7 @@ export const store = configureStore({
   reducer: {
     auth: persistedAuthReducer,
     counter: counterReducer,
+    alunos: alunoReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

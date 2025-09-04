@@ -12,15 +12,18 @@ const salt = bcrypt.genSaltSync(10);
 
 export default [
   {
-    matricula: "123",
-    senha: bcrypt.hashSync("2134", salt),
-    name: "Rafael",
-    role: "user"
+    id: 1,
+    matricula: "admin",
+    senha: bcrypt.hashSync("admin123", 10),
+    name: "Administrador",
+    role: "admin",
   },
   {
-    matricula: "admin",
-    senha: bcrypt.hashSync("admin123", salt),
-    name: "Administrador",
-    role: "admin"
-  }
+    id: 2,
+    matricula: "123",
+    senha: bcrypt.hashSync("2134", 10),
+    name: "Rafael",
+    role: "aluno",
+  },
 ];
+
