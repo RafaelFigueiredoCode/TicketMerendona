@@ -4,7 +4,6 @@ import { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import CustomButton from '../components/CustomButton';
 import CustomInput from '../components/CustomInput';
-import bcrypt from "bcryptjs";
 import { saveAlunos } from "../features/AlunosSlice";
 
 export default function AdminScreen() {
@@ -20,32 +19,47 @@ export default function AdminScreen() {
 
   const handleAdicionar = async () => {
     if (!nome || !matricula || !senha || !cpf) {
-      alert("Todos os campos são obrigatórios!");
+      Alert.alert("Erro", "Todos os campos são obrigatórios!");
       return;
     }
   
-    const salt = bcrypt.genSaltSync(10);
-    const senhaCriptografada = bcrypt.hashSync(senha, salt);
-  
     const novoAluno = {
       id: Date.now(),
-      nome,
-      matricula,
-      cpf,
-      senha: senhaCriptografada,
+      nome: nome.trim(),
+      matricula: matricula.trim(),
+      cpf: cpf.trim(),
+      senha: senha.trim(), // salvo em texto simples
       role: "aluno",
     };
   
+    // adiciona no Redux (estado em memória)
     dispatch(adicionarAluno(novoAluno));
   
-    // Pega o estado atualizado após dispatch
-    const updatedAlunos = [...alunos, novoAluno];
+    // atualiza também no AsyncStorage
+    const updatedAlunos = [...(alunos || []), novoAluno];
     await dispatch(saveAlunos(updatedAlunos));
   
+    // limpa os inputs
     setNome("");
     setMatricula("");
     setCpf("");
     setSenha("");
+  
+    // 🚀 login automático do aluno recém-criado
+    dispatch(
+      loginSuccess({
+        user: {
+          id: novoAluno.id,
+          nome: novoAluno.nome,
+          matricula: novoAluno.matricula,
+          role: novoAluno.role,
+        },
+        token: null,
+      })
+    );
+  
+    // redireciona para tela inicial do aluno
+    navigation.replace("Home");
   };
   
   const handlePesquisar = () => {

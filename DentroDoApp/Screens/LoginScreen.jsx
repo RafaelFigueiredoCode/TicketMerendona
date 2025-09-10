@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { View, TextInput, Button, Alert, StyleSheet } from "react-native";
-import bcrypt from "bcryptjs";
 import users from "../Users/users";
 import { loginSuccess } from "../features/GlobalSave";
+import { loadAlunos } from "../features/AlunosSlice";
 
 export default function LoginScreen({ navigation }) {
   const [matricula, setMatricula] = useState("");
@@ -11,36 +11,44 @@ export default function LoginScreen({ navigation }) {
   const dispatch = useDispatch();
   const alunos = useSelector((state) => state.alunos.alunos); // alunos cadastrados
 
+  useEffect(() => {
+    dispatch(loadAlunos());
+  }, [dispatch]);
+
 
   const handleLogin = () => {
-    // junta os arrays: alunos cadastrados + usuários fixos
-    const todosUsuarios = [...alunos, ...users];
-
-    // procura usuário pela matrícula
-    const found = todosUsuarios.find((u) => u.matricula === matricula);
+    // junta os arrays com segurança
+    const todosUsuarios = [...(alunos || []), ...(users || [])];
+  
+    // procura usuário pela matrícula (ignora espaços/maiúsculas/minúsculas)
+    const found = todosUsuarios.find(
+      (u) => u.matricula.trim === matricula.trim
+    );
+  
     if (!found) {
       Alert.alert("Erro", "Matrícula ou senha incorreta");
       return;
     }
-
-    // compara senha com bcrypt
-    const isMatch = bcrypt.compareSync(password, found.senha);
-    if (!isMatch) {
+  
+    // compara senha em texto simples
+    if (password.trim() !== found.senha.trim()) {
       Alert.alert("Erro", "Matrícula ou senha incorreta");
       return;
     }
-
-    // autenticação Redux
+  
+    // autenticação Redux (ajustado para o authSlice)
     dispatch(
       loginSuccess({
-        aluno: {
+        user: {
           id: found.id,
-          nome: found.nome || found.name, // pega nome do aluno ou do usuário fixo
+          nome: found.nome || found.name, // aluno criado ou usuário fixo
           matricula: found.matricula,
           role: found.role || "aluno",
         },
-      }))
-
+        token: null, // você pode gerar um token JWT ou usar null
+      })
+    );
+  
     // redirecionamento
     if (found.role === "admin") {
       navigation.replace("AdminHome");
