@@ -3,7 +3,7 @@ export default [
   {
     id: 1,
     matricula: "admin",
-    senha: "admin123",
+    senha: "abc",
     name: "Administrador",
     role: "admin",
   },

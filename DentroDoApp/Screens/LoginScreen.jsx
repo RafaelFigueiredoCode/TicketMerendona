@@ -22,7 +22,7 @@ export default function LoginScreen({ navigation }) {
   
     // procura usuário pela matrícula (ignora espaços/maiúsculas/minúsculas)
     const found = todosUsuarios.find(
-      (u) => u.matricula.trim === matricula.trim
+      (u) => u.matricula.trim() === matricula.trim()
     );
   
     if (!found) {
