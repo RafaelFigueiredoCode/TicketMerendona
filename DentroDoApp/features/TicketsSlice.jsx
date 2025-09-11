@@ -55,13 +55,22 @@ export const updateTicketsByAluno = async (alunoId, newTickets) => {
   };
   export const validateTicket = async (alunoId, ticketId) => {
     try {
-      let tickets = await getTickets(alunoId);
-      tickets = tickets.map((t) =>
+      const storedTickets = await AsyncStorage.getItem("tickets");
+      const tickets = storedTickets ? JSON.parse(storedTickets) : {};
+  
+      if (!tickets[alunoId]) return [];
+  
+      const updatedTickets = tickets[alunoId].map(t =>
         t.id === ticketId ? { ...t, status: "indisponivel" } : t
       );
-      await AsyncStorage.setItem(`${TICKETS_KEY}_${alunoId}`, JSON.stringify(tickets));
-      return tickets;
-    } catch (e) {
-      console.error("Erro ao validar ticket:", e);
+  
+      tickets[alunoId] = updatedTickets;
+  
+      await AsyncStorage.setItem("tickets", JSON.stringify(tickets));
+  
+      return updatedTickets; // retorna para atualizar o estado na tela
+    } catch (error) {
+      console.error("Erro ao validar ticket:", error);
+      return [];
     }
   };

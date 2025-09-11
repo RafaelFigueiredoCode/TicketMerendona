@@ -4,15 +4,32 @@ import { useSelector } from 'react-redux';
 import * as Location from 'expo-location';
 import CustomButton from '../components/CustomButton'
 import { saveTicket, getTicketsByAluno} from "../features/TicketsSlice";
+import { useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function TicketScreen ({ navigation }) {
   const [ticketReceived, setTicketReceived] = useState(false);
   const [isInAllowedRegion, setIsInAllowedRegion] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [lastReceivedDate, setLastReceivedDate] = useState(null);
+  const [currentTicket, setCurrentTicket] = useState(null);
 
   const user = useSelector((state) => state.auth.user);
   const alunoId = user?.id;
+
+ useFocusEffect(
+    useCallback(() => {
+      const loadTickets = async () => {
+        if (!alunoId) return;
+        const alunoTickets = await getTicketsByAluno(alunoId);
+        const today = new Date().toDateString();
+        const ticketHoje = alunoTickets.find(t => t.data === today);
+  
+        setCurrentTicket(ticketHoje || null);
+      };
+      loadTickets();
+    }, [alunoId])
+  );
 
 
   useEffect(() => {
@@ -71,28 +88,20 @@ export default function TicketScreen ({ navigation }) {
 
   const receiveTicket = async () => {
     const today = new Date().toDateString();
-
-    if (lastReceivedDate === today) {
+    
+    const alunoTickets = await getTicketsByAluno(alunoId);
+    const ticketHoje = alunoTickets.find(t => t.data === today);
+  
+    if (ticketHoje) {
       Alert.alert('Aviso', 'Você já recebeu seu ticket hoje!');
+      setCurrentTicket(ticketHoje);
       return;
     }
-
-    if (!isInAllowedRegion) {
-      Alert.alert('Localização', 'Você precisa estar na escola para receber o ticket');
-      return;
-    }
-
-    const ticket = {
-      id: Date.now(),
-      data: today,
-      status: "ativo",
-    };
-
+  
+    const ticket = { id: Date.now(), data: today, status: "ativo" };
     await saveTicket(alunoId, ticket);
-
-    setTicketReceived(true);
-    setLastReceivedDate(today);
-
+  
+    setCurrentTicket(ticket);  // <- aqui
     Alert.alert('Sucesso', 'Ticket recebido com sucesso!');
   };
 
@@ -101,10 +110,13 @@ export default function TicketScreen ({ navigation }) {
       <Text style={styles.title}>Controle de Tickets de Refeição</Text>
 
       <View style={styles.statusContainer}>
-        <Text style={styles.statusLabel}>Status do Ticket:</Text>
-        <Text style={[styles.statusValue, ticketReceived ? styles.available : styles.unavailable]}>
-          {ticketReceived ? 'Ticket Disponível' : 'Ticket Indisponível'}
-        </Text>
+      <Text style={[styles.statusValue, currentTicket?.status === "ativo" ? styles.available : styles.unavailable]}>
+      {currentTicket
+      ? currentTicket.status === "ativo" 
+      ? "Ticket pronto para uso!"
+      : "Ticket já validado"
+      : "Nenhum ticket disponível"}
+      </Text>
       </View>
 
       <View style={styles.timeContainer}>

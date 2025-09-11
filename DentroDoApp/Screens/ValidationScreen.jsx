@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import { useSelector } from 'react-redux';
 import CustomButton from '../components/CustomButton';
-import { getTicketsByAluno, updateTicketStatus } from '../features/TicketsSlice';
+import { getTicketsByAluno, validateTicket } from '../features/TicketsSlice';
 
 export default function ValidationScreen({ navigation }) {
   const [tickets, setTickets] = useState([]);
@@ -23,25 +23,21 @@ export default function ValidationScreen({ navigation }) {
     loadTickets();
   }, [alunoId]);
 
-  const validateTicket = async () => {
+  const validateTicketHandler = async () => {
     if (!currentTicket) return;
-
+  
     Alert.alert(
       "Confirmar",
       "Deseja validar este ticket?",
       [
         { text: "Cancelar" },
         { 
-          text: "Sim", 
+          text: "Sim",
           onPress: async () => {
-            await updateTicketStatus(alunoId, currentTicket.id, "indisponivel");
+            const updatedTickets = await validateTicket(alunoId, currentTicket.id);
+            setTickets(updatedTickets);
+            setCurrentTicket(null); // remove ticket da tela
             Alert.alert("Sucesso", "Ticket validado!");
-            // atualiza o estado local
-            const remainingTickets = tickets.map(t =>
-              t.id === currentTicket.id ? { ...t, status: "indisponivel" } : t
-            );
-            setTickets(remainingTickets);
-            setCurrentTicket(null); // remove o ticket da tela
           }
         }
       ]
@@ -56,7 +52,7 @@ export default function ValidationScreen({ navigation }) {
           <Text style={[styles.statusText, currentTicket.status === "ativo" ? styles.active : styles.inactive]}>
             Status: {currentTicket.status === "ativo" ? "Disponível" : "Indisponível"}
           </Text>
-          <CustomButton title="Validar" onPress={validateTicket} style={styles.validateButton}/>
+          <CustomButton title="Validar" onPress={validateTicketHandler} style={styles.validateButton}/>
         </>
       ) : (
         <Text style={styles.noTicketText}>Nenhum ticket disponível</Text>
