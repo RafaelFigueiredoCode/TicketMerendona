@@ -1,10 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
-import { adicionarAluno } from "../features/AlunosSlice";
+import { adicionarAluno, saveAlunos, clearAll } from "../features/AlunosSlice";
 import { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import CustomButton from '../components/CustomButton';
 import CustomInput from '../components/CustomInput';
-import { saveAlunos } from "../features/AlunosSlice";
+
+
 
 export default function AdminScreen() {
   const dispatch = useDispatch();
@@ -13,7 +14,6 @@ export default function AdminScreen() {
   const [matricula, setMatricula] = useState("");
   const [cpf, setCpf] = useState("");
   const [senha, setSenha] = useState("");
-  const [role, setRole] = useState("aluno");
   const [resultado, setResultado] = useState(null);
   const alunos = useSelector((state) => state.alunos.alunos);
 
@@ -28,24 +28,23 @@ export default function AdminScreen() {
       nome: nome.trim(),
       matricula: matricula.trim(),
       cpf: cpf.trim(),
-      senha: senha.trim(), // salvo em texto simples
+      senha: senha.trim(),
       role: "aluno",
     };
   
-    // adiciona no Redux (estado em memória)
+    
     dispatch(adicionarAluno(novoAluno));
   
-    // atualiza também no AsyncStorage
+    
     const updatedAlunos = [...(alunos || []), novoAluno];
     await dispatch(saveAlunos(updatedAlunos));
   
-    // limpa os inputs
+    
     setNome("");
     setMatricula("");
     setCpf("");
     setSenha("");
-  
-    // 🚀 login automático do aluno recém-criado
+
     dispatch(
       loginSuccess({
         user: {
@@ -129,6 +128,11 @@ export default function AdminScreen() {
           </Text>
         )
       )}
+      <CustomButton 
+      title="Deletar Tudo" 
+      onPress={clearAll} 
+      style={styles.matriculeButton}
+      />
     </View>
   );
 }

@@ -1,34 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
+import { useSelector } from 'react-redux';
 import * as Location from 'expo-location';
-import CustomButton from '../components/CustomButton';
+import CustomButton from '../components/CustomButton'
+import { saveTicket, getTicketsByAluno} from "../features/TicketsSlice";
 
-export default function TicketScreen ({navigation}) {
+export default function TicketScreen ({ navigation }) {
   const [ticketReceived, setTicketReceived] = useState(false);
   const [isInAllowedRegion, setIsInAllowedRegion] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [lastReceivedDate, setLastReceivedDate] = useState(null);
 
-  // Atualiza o horário a cada minuto
+  const user = useSelector((state) => state.auth.user);
+  const alunoId = user?.id;
+
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000);
-    
     return () => clearInterval(timer);
   }, []);
 
-  // Verifica se está no horário permitido (5 minutos antes do intervalo)
-  const isWithinAllowedTime = () => {
-    const now = currentTime;
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    
-    // Supondo que o intervalo seja às 12:00
-    return hours === 8 && minutes >= 30;
-  };
+  useEffect(() => {
+    const loadTickets = async () => {
+      if (!alunoId) return;
+      
+      const tickets = await getTicketsByAluno(alunoId); 
+      
+      if (tickets.length > 0) {
+        const ultimoTicket = tickets[tickets.length - 1];
+        setLastReceivedDate(ultimoTicket.data);
+  
+       
+        if (ultimoTicket.data === new Date().toDateString()) {
+          setTicketReceived(true);
+        } else {
+          setTicketReceived(false);
+        }
+      } else {
+        setTicketReceived(false);
+        setLastReceivedDate(null);
+      }
+    };
+  
+    loadTickets();
+  }, [alunoId]);
 
-  // Simula a verificação de localização
   const checkLocation = async () => {
     if (Platform.OS !== 'web') {
       try {
@@ -38,9 +56,7 @@ export default function TicketScreen ({navigation}) {
           return;
         }
 
-        let location = await Location.getCurrentPositionAsync({});
-        // Simulação: verificar se está dentro da região da escola
-        // Aqui você implementaria a lógica real de verificação de geolocalização
+        await Location.getCurrentPositionAsync({});
         setIsInAllowedRegion(true);
         Alert.alert('Localização verificada', 'Você está na região permitida!');
       } catch (error) {
@@ -48,43 +64,42 @@ export default function TicketScreen ({navigation}) {
         Alert.alert('Erro', 'Não foi possível verificar sua localização');
       }
     } else {
-      // Para ambiente de desenvolvimento/web, simula a permissão
       setIsInAllowedRegion(true);
       Alert.alert('Simulação', 'Em ambiente web, a localização é simulada como permitida');
     }
   };
 
-  // Função para receber o ticket
-  const receiveTicket = () => {
+  const receiveTicket = async () => {
     const today = new Date().toDateString();
-    
-    // Verifica se já recebeu ticket hoje
+
     if (lastReceivedDate === today) {
       Alert.alert('Aviso', 'Você já recebeu seu ticket hoje!');
       return;
     }
 
-    // Verifica se está no horário permitido
-    if (!isWithinAllowedTime()) {
-      Alert.alert('Fora do horário', 'Os tickets só estão disponíveis 5 minutos antes do intervalo');
-      return;
-    }
-
-    // Verifica se está na região permitida
     if (!isInAllowedRegion) {
       Alert.alert('Localização', 'Você precisa estar na escola para receber o ticket');
       return;
     }
 
+    const ticket = {
+      id: Date.now(),
+      data: today,
+      status: "ativo",
+    };
+
+    await saveTicket(alunoId, ticket);
+
     setTicketReceived(true);
     setLastReceivedDate(today);
+
     Alert.alert('Sucesso', 'Ticket recebido com sucesso!');
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Controle de Tickets de Refeição</Text>
-      
+
       <View style={styles.statusContainer}>
         <Text style={styles.statusLabel}>Status do Ticket:</Text>
         <Text style={[styles.statusValue, ticketReceived ? styles.available : styles.unavailable]}>
@@ -96,56 +111,48 @@ export default function TicketScreen ({navigation}) {
         <Text style={styles.timeText}>
           Horário atual: {currentTime.toLocaleTimeString()}
         </Text>
-        <Text style={styles.timeInfo}>
-          {isWithinAllowedTime() 
-            ? '✅ No horário de recebimento' 
-            : '❌ Fora do horário de recebimento'}
-        </Text>
       </View>
 
       <CustomButton
-        title= {isInAllowedRegion ? '✅ Na Escola' : 'Verificar Localização'}
+        title={isInAllowedRegion ? '✅ Na Escola' : 'Verificar Localização'}
         style={[styles.locationButton, isInAllowedRegion && styles.locationVerified]}
         onPress={checkLocation}
       />
+
       <CustomButton
-        title= 'Receber Ticket'
+        title='Receber Ticket'
         style={[
           styles.receiveButton, 
-          (!isWithinAllowedTime() || ticketReceived || !isInAllowedRegion) && styles.buttonDisabled
+          (ticketReceived || !isInAllowedRegion) && styles.buttonDisabled
         ]}
         onPress={receiveTicket}
-        disabled={!isWithinAllowedTime() || ticketReceived || !isInAllowedRegion}
+        disabled={ticketReceived || !isInAllowedRegion}
       />
-      <View style={styles.infoContainer}>
-        <Text style={styles.infoText}>
-          • Apenas 1 ticket por dia por aluno
-        </Text>
-        <Text style={styles.infoText}>
-          • Disponível apenas 5 minutos antes do intervalo
-        </Text>
-        <Text style={styles.infoText}>
-          • É necessário estar na escola
-        </Text>
+            <View style={styles.infoContainer}>
+        <Text style={styles.infoText}>• Apenas 1 ticket por dia por aluno</Text>
+        <Text style={styles.infoText}>• Disponível apenas 5 minutos antes do intervalo</Text>
+        <Text style={styles.infoText}>• É necessário estar na escola</Text>
       </View>
-
-      <Text style={styles.titleScreens}>---------Outras Telas----------</Text>
+      <View style={styles.separator} /> 
+      <Text style={styles.titleScreens}>Outras Telas</Text>
       <CustomButton 
-      title = 'Validar Ticket'
-      style= {styles.validationButton}
+        title='Validar Ticket'
+        style={styles.validationButton}
+        onPress={() => navigation.navigate("Validation")}
       />
       <CustomButton 
-      title = 'Ver Intervalo'
-      style= {styles.intervaloButton}
-      onPress={() => navigation.navigate("Interval")}
+        title='Ver Intervalo'
+        style={styles.intervaloButton}
+        onPress={() => navigation.navigate("Interval")}
       />
       <CustomButton 
-      title = 'Ver Localização'
-      style= {styles.localizationButton}
+        title='Ver Localização'
+        style={styles.localizationButton}
+        onPress={checkLocation}
       />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -255,5 +262,11 @@ const styles = StyleSheet.create({
     width: '80%',
     alignItems: 'center',
   },
+  separator: {
+    height: 2,             
+    width: '80%',           
+    backgroundColor: '#00008B', 
+    marginVertical: 16,    
+  }
 });
 

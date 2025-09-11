@@ -17,6 +17,16 @@ export const saveAlunos = createAsyncThunk(
   }
 );
 
+export const clearAll = async () => {
+  try {
+    await AsyncStorage.clear();
+    console.log("Todos os dados foram removidos.");
+  } catch (e) {
+    console.error("Erro ao limpar dados:", e);
+  }
+};
+
+
 const alunosSlice = createSlice({
   name: "alunos",
   initialState: {

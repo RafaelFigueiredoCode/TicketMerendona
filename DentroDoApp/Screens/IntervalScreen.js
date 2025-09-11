@@ -67,20 +67,22 @@ const IntervalScreen = ({navigation}) => {
         {timeLeft}
       </Text>
       </View>
+      <View style={styles.separator} /> 
 
-      <Text style={styles.titleScreens}>---------Outras Telas----------</Text>
+      <Text style={styles.titleScreens}>Outras Telas</Text>
       <CustomButton 
       title = 'Validar Ticket'
       style= {styles.validationButton}
+      onPress={() => navigation.navigate("Validation")}
       />
       <CustomButton 
       title = 'Ver Localização'
-      style= {styles.intervaloButton}
+      style= {styles.localizationButton}
       
       />
       <CustomButton 
       title = 'Voltar para Tela Inicial'
-      style= {styles.localizationButton}
+      style= {styles.intervaloButton}
       onPress={() => navigation.navigate("Home")}
        />
     </View>
@@ -144,6 +146,12 @@ const styles = StyleSheet.create({
     width: '80%',
     alignItems: 'center',
   },
+  separator: {
+    height: 2,             
+    width: '80%',           
+    backgroundColor: '#00008B', 
+    marginVertical: 16,    
+  }
 });
 
 export default IntervalScreen;

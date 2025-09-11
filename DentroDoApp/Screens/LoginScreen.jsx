@@ -9,18 +9,16 @@ export default function LoginScreen({ navigation }) {
   const [matricula, setMatricula] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-  const alunos = useSelector((state) => state.alunos.alunos); // alunos cadastrados
+  const alunos = useSelector((state) => state.alunos.alunos); 
 
   useEffect(() => {
     dispatch(loadAlunos());
   }, [dispatch]);
 
-
   const handleLogin = () => {
-    // junta os arrays com segurança
+    
     const todosUsuarios = [...(alunos || []), ...(users || [])];
   
-    // procura usuário pela matrícula (ignora espaços/maiúsculas/minúsculas)
     const found = todosUsuarios.find(
       (u) => u.matricula.trim() === matricula.trim()
     );
@@ -30,26 +28,25 @@ export default function LoginScreen({ navigation }) {
       return;
     }
   
-    // compara senha em texto simples
+    
     if (password.trim() !== found.senha.trim()) {
       Alert.alert("Erro", "Matrícula ou senha incorreta");
       return;
     }
   
-    // autenticação Redux (ajustado para o authSlice)
+    
     dispatch(
       loginSuccess({
         user: {
           id: found.id,
-          nome: found.nome || found.name, // aluno criado ou usuário fixo
+          nome: found.nome || found.name, 
           matricula: found.matricula,
           role: found.role || "aluno",
         },
-        token: null, // você pode gerar um token JWT ou usar null
+        token: null, 
       })
     );
   
-    // redirecionamento
     if (found.role === "admin") {
       navigation.replace("AdminHome");
     } else {
