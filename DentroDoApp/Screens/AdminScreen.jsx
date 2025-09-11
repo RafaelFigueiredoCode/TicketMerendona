@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { adicionarAluno, saveAlunos, clearAll } from "../features/AlunosSlice";
 import { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Alert} from "react-native";
 import CustomButton from '../components/CustomButton';
 import CustomInput from '../components/CustomInput';
 
@@ -96,7 +96,10 @@ export default function AdminScreen() {
       />
       <CustomButton 
       title="Adicionar" 
-      onPress={handleAdicionar} 
+      onPress={() => {
+      handleAdicionar(); 
+      Alert.alert('Aviso', 'Você adicionou um aluno!');
+      }}
       style= {styles.locationButton}
       />
       <Text style={styles.titleScreens}>Quer Visualizar Aluno?</Text>
