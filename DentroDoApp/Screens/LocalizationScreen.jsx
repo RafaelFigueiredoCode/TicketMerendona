@@ -1,30 +1,60 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Alert, Platform } from 'react-native';
 import * as Location from 'expo-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomButton from '../components/CustomButton';
+import { useSelector } from 'react-redux';
 
-export default function LocationScreen({navigation}) {
-  const [isInAllowedRegion, setIsInAllowedRegion] = useState(false);
+export default function LocationScreen({ navigation }) {
+  const [isInAllowedRegion, setIsInAllowedRegionLocal] = useState(false);
+  const [alreadyVerified, setAlreadyVerified] = useState(false);
+  const user = useSelector((state) => state.auth.user);
+  const alunoId = user?.id;
 
+  useEffect(() => {
+    const checkStoredVerification = async () => {
+      if (!alunoId) return;
+  
+      const value = await AsyncStorage.getItem(`hasVerifiedLocation_${alunoId}`);
+      if (value === "true") {
+        setIsInAllowedRegionLocal(true);
+        setAlreadyVerified(true);
+      }
+    };
+    checkStoredVerification();
+  }, [alunoId]);
+  
   const checkLocation = async () => {
-    if (Platform.OS !== 'web') {
-      try {
+    if (alreadyVerified) {
+      Alert.alert("Aviso", "Você já verificou sua localização.");
+      return;
+    }
+
+    try {
+      if (Platform.OS !== 'web') {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           Alert.alert('Permissão de localização negada');
           return;
         }
-
         await Location.getCurrentPositionAsync({});
-        setIsInAllowedRegion(true);
-        Alert.alert('Localização verificada', 'Você está na região permitida!');
-      } catch (error) {
-        console.error('Erro ao obter localização:', error);
-        Alert.alert('Erro', 'Não foi possível verificar sua localização');
       }
-    } else {
-      setIsInAllowedRegion(true);
-      Alert.alert('Simulação', 'Em ambiente web, a localização é simulada como permitida');
+
+      // marca localmente e persiste no AsyncStorage
+      await AsyncStorage.setItem(`hasVerifiedLocation_${alunoId}`, "true");
+      setAlreadyVerified(true);
+      setIsInAllowedRegionLocal(true);
+
+      Alert.alert(
+        'Localização verificada',
+        Platform.OS === 'web'
+          ? 'Em ambiente web, a localização é simulada como permitida'
+          : 'Você está na região permitida!'
+      );
+
+    } catch (error) {
+      console.error('Erro ao obter localização:', error);
+      Alert.alert('Erro', 'Não foi possível verificar sua localização');
     }
   };
 
@@ -36,6 +66,7 @@ export default function LocationScreen({navigation}) {
         title={isInAllowedRegion ? '✅ Na Escola' : 'Verificar Localização'}
         style={[styles.locationButton, isInAllowedRegion && styles.locationVerified]}
         onPress={checkLocation}
+        disabled={alreadyVerified} 
       />
 
       <View style={styles.infoContainer}>
@@ -43,6 +74,12 @@ export default function LocationScreen({navigation}) {
         <Text style={styles.infoText}>• A localização é verificada automaticamente</Text>
         <Text style={styles.infoText}>• Permissão de localização é obrigatória</Text>
       </View>
+
+      <CustomButton
+        title="Voltar"
+        onPress={()=> navigation.navigate("Home", { refreshLocation: true })}
+        style={styles.validationButton}
+      />
     </View>
   );
 }
@@ -82,5 +119,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     color: '#666',
     textAlign: 'center',
+  },
+  validationButton: {
+    backgroundColor: '#000',
+    padding: 15,
+    marginBottom: 15,
+    borderRadius: 8,
+    width: '90%',
+    alignItems: 'center',
+    marginTop: 30,
   },
 });
