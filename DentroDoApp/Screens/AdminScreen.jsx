@@ -7,59 +7,12 @@ import CustomInput from '../components/CustomInput';
 
 
 
-export default function AdminScreen() {
-  const dispatch = useDispatch();
-  const [nome, setNome] = useState("");
+export default function AdminScreen({navigation}) {
   const [matriculaFind, setMatriculaFind] = useState("");
-  const [matricula, setMatricula] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [senha, setSenha] = useState("");
   const [resultado, setResultado] = useState(null);
   const alunos = useSelector((state) => state.alunos.alunos);
 
-  const handleAdicionar = async () => {
-    if (!nome || !matricula || !senha || !cpf) {
-      Alert.alert("Erro", "Todos os campos são obrigatórios!");
-      return;
-    }
-  
-    const novoAluno = {
-      id: Date.now(),
-      nome: nome.trim(),
-      matricula: matricula.trim(),
-      cpf: cpf.trim(),
-      senha: senha.trim(),
-      role: "aluno",
-    };
-  
-    
-    dispatch(adicionarAluno(novoAluno));
-  
-    
-    const updatedAlunos = [...(alunos || []), novoAluno];
-    await dispatch(saveAlunos(updatedAlunos));
-  
-    
-    setNome("");
-    setMatricula("");
-    setCpf("");
-    setSenha("");
 
-    dispatch(
-      loginSuccess({
-        user: {
-          id: novoAluno.id,
-          nome: novoAluno.nome,
-          matricula: novoAluno.matricula,
-          role: novoAluno.role,
-        },
-        token: null,
-      })
-    );
-  
-    // redireciona para tela inicial do aluno
-    navigation.replace("Home");
-  };
   
   const handlePesquisar = () => {
     const aluno = alunos.find((a) => a.matricula === matriculaFind);
@@ -67,41 +20,15 @@ export default function AdminScreen() {
   };
 
   return (
-    <View style= {styles.container}>
-        <Text style={styles.titleScreens}>Vai Cadastrar Aluno?</Text>
-      <CustomInput
-        placeholder="Nome do aluno"
-        value={nome}
-        onChangeText={setNome}
-        style={styles.alunoInput}
+     <View style={styles.container}>
+      <Text style={styles.titleScreens}>Vai adicionar um Aluno?</Text>
+      <CustomButton
+      title="Tela de Adicionar"
+      style={styles.locationButton}
+      onPress={() => navigation.navigate("AddScreen")}
       />
-        <CustomInput
-        placeholder="Matricula do Aluno"
-        value={matricula}
-        onChangeText={setMatricula}
-        style={styles.alunoInput}
-      />
-       <CustomInput
-        placeholder="CPF do Aluno"
-        value={cpf}
-        onChangeText={setCpf}
-        style={styles.alunoInput}
-      />
-      <CustomInput
-       placeholder="Senha do Aluno"
-       value={senha}
-       onChangeText={setSenha}
-       secureTextEntry
-       style={styles.alunoInput}
-      />
-      <CustomButton 
-      title="Adicionar" 
-      onPress={() => {
-      handleAdicionar(); 
-      Alert.alert('Aviso', 'Você adicionou um aluno!');
-      }}
-      style= {styles.locationButton}
-      />
+
+      
       <Text style={styles.titleScreens}>Quer Visualizar Aluno?</Text>
       <CustomInput
         placeholder="Digite a matrícula"

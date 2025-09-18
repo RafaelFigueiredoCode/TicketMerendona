@@ -48,6 +48,7 @@ export default function ValidationScreen({ navigation }) {
     <View style={styles.container}>
       {currentTicket ? (
         <>
+        <Text style= {}></Text>
           <Text style={styles.ticketText}>Ticket: {currentTicket.data}</Text>
           <Text style={[styles.statusText, currentTicket.status === "ativo" ? styles.active : styles.inactive]}>
             Status: {currentTicket.status === "ativo" ? "Disponível" : "Indisponível"}

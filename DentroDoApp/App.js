@@ -10,6 +10,7 @@ import TicketScreen from "./Screens/TicketScreen";
 import AdminScreen from './Screens/AdminScreen';
 import IntervalScreen from './Screens/IntervalScreen';
 import ValidationScreen from './Screens/ValidationScreen';
+import AddAlunoScreen from './Screens/AddAlunoScreen'
 
  
 const Stack = createStackNavigator();
@@ -25,6 +26,7 @@ export default function App() {
             <Stack.Screen name="Interval" component={IntervalScreen}/>
             <Stack.Screen name="AdminHome" component={AdminScreen}/>
             <Stack.Screen name="Validation" component={ValidationScreen}/> 
+            <Stack.Screen name="AddScreen" component={AddAlunoScreen}/> 
           </Stack.Navigator>
         </NavigationContainer>
       </PersistGate>
