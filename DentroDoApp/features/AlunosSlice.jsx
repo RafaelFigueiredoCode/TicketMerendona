@@ -25,6 +25,14 @@ export const clearAll = async () => {
     console.error("Erro ao limpar dados:", e);
   }
 };
+export const clearTickets = async () => {
+  try {
+    await AsyncStorage.removeItem("tickets"); // só apaga a chave dos tickets
+    console.log("Tickets removidos com sucesso.");
+  } catch (e) {
+    console.error("Erro ao limpar tickets:", e);
+  }
+};
 
 
 const alunosSlice = createSlice({

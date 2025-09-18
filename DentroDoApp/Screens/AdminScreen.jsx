@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { adicionarAluno, saveAlunos, clearAll } from "../features/AlunosSlice";
+import { clearAll, clearTickets } from "../features/AlunosSlice";
 import { useState } from "react";
 import { View, Text, StyleSheet, Alert} from "react-native";
 import CustomButton from '../components/CustomButton';
@@ -59,8 +59,8 @@ export default function AdminScreen({navigation}) {
         )
       )}
       <CustomButton 
-      title="Deletar Tudo" 
-      onPress={clearAll} 
+      title="Deletar Tickets" 
+      onPress={clearTickets} 
       style={styles.matriculeButton}
       />
     </View>

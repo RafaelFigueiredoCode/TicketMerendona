@@ -10,6 +10,7 @@ export default function ValidationScreen({ navigation }) {
 
   const user = useSelector((state) => state.auth.user);
   const alunoId = user?.id;
+  const alunoName = user?.nome;
 
   useEffect(() => {
     const loadTickets = async () => {
@@ -48,7 +49,7 @@ export default function ValidationScreen({ navigation }) {
     <View style={styles.container}>
       {currentTicket ? (
         <>
-        <Text style= {}></Text>
+        <Text style= {styles.ticketText}>Aluno: {alunoName}</Text>
           <Text style={styles.ticketText}>Ticket: {currentTicket.data}</Text>
           <Text style={[styles.statusText, currentTicket.status === "ativo" ? styles.active : styles.inactive]}>
             Status: {currentTicket.status === "ativo" ? "Disponível" : "Indisponível"}
