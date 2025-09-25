@@ -11,24 +11,24 @@ export default function TicketScreen({ navigation }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentTicket, setCurrentTicket] = useState(null);
   const [hasVerifiedLocation, setHasVerifiedLocation] = useState(false);
+  const [timeLeft, setTimeLeft] = useState("");
 
   const user = useSelector(state => state.auth.user);
   const alunoId = user?.id;
 
-  // Atualiza tickets e verificação sempre que a tela recebe foco
+  const INTERVAL_START = { hour: 9, minute: 20 };
+  const INTERVAL_END = { hour: 9, minute: 35 };
+
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
         if (!alunoId) return;
-
-        // Carrega tickets do aluno
         const tickets = await getTicketsByAluno(alunoId);
         const today = new Date().toDateString();
         const ticketHoje = tickets.find(t => t.data === today);
         setCurrentTicket(ticketHoje || null);
         setTicketReceived(!!ticketHoje);
 
-        // Carrega verificação de localização do AsyncStorage
         const loc = await AsyncStorage.getItem(`hasVerifiedLocation_${alunoId}`);
         setHasVerifiedLocation(loc === "true");
       };
@@ -36,11 +36,52 @@ export default function TicketScreen({ navigation }) {
     }, [alunoId])
   );
 
-  // Atualiza o horário a cada minuto
+  // Atualiza o horário e o contador a cada segundo
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    const timer = setInterval(() => {
+      const now = new Date();
+      setCurrentTime(now);
+
+      const start = new Date();
+      start.setHours(INTERVAL_START.hour, INTERVAL_START.minute, 0, 0);
+
+      const end = new Date();
+      end.setHours(INTERVAL_END.hour, INTERVAL_END.minute, 0, 0);
+
+      if (now < start) {
+        // antes do intervalo
+        const diff = start - now;
+        setTimeLeft(`Começa em ${formatTime(diff)}`);
+      } else if (now >= start && now <= end) {
+        // dentro do intervalo
+        const diff = end - now;
+        setTimeLeft(`Termina em ${formatTime(diff)}`);
+      } else {
+        // já passou
+        setTimeLeft("Intervalo encerrado");
+      }
+    }, 1000);
+
     return () => clearInterval(timer);
   }, []);
+
+  const formatTime = (ms) => {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${minutes}m ${seconds}s`;
+  };
+
+  const isWithinInterval = () => {
+    const now = new Date();
+    const start = new Date();
+    start.setHours(INTERVAL_START.hour, INTERVAL_START.minute, 0, 0);
+    const end = new Date();
+    end.setHours(INTERVAL_END.hour, INTERVAL_END.minute, 0, 0);
+    const release = new Date(start);
+    release.setMinutes(start.getMinutes() - 5);
+
+    return now >= release && now <= end;
+  };
 
   const receiveTicket = async () => {
     const today = new Date().toDateString();
@@ -49,9 +90,12 @@ export default function TicketScreen({ navigation }) {
       Alert.alert("Aviso", "Você precisa verificar sua localização antes de receber o ticket.");
       return;
     }
-
     if (ticketReceived) {
       Alert.alert("Aviso", "Você já recebeu seu ticket hoje!");
+      return;
+    }
+    if (!isWithinInterval()) {
+      Alert.alert("Aviso", "O ticket só pode ser retirado 5 minutos antes e durante o intervalo.");
       return;
     }
 
@@ -86,16 +130,19 @@ export default function TicketScreen({ navigation }) {
         <Text style={styles.timeText}>
           Horário atual: {currentTime.toLocaleTimeString()}
         </Text>
+        <Text style={styles.timeText}>{timeLeft}</Text>
       </View>
 
       <CustomButton
         title='Receber Ticket'
         style={[
           styles.receiveButton,
-          ticketReceived || !hasVerifiedLocation ? styles.buttonDisabled : styles.receiveButton
+          ticketReceived || !hasVerifiedLocation || !isWithinInterval()
+            ? styles.buttonDisabled
+            : styles.receiveButton
         ]}
         onPress={receiveTicket}
-        disabled={ticketReceived || !hasVerifiedLocation}
+        disabled={ticketReceived || !hasVerifiedLocation || !isWithinInterval()}
       />
 
       <View style={styles.infoContainer}>
@@ -103,7 +150,6 @@ export default function TicketScreen({ navigation }) {
         <Text style={styles.infoText}>• Disponível apenas 5 minutos antes do intervalo</Text>
         <Text style={styles.infoText}>• É necessário estar na escola</Text>
       </View>
-
       <View style={styles.separator} />
 
       <Text style={styles.titleScreens}>Outras Telas</Text>
