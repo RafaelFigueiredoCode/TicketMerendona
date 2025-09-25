@@ -1,39 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert, Platform } from 'react-native';
-import * as Location from 'expo-location';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import CustomButton from '../components/CustomButton';
-import { useSelector } from 'react-redux';
-import MapView, { Marker } from 'react-native-maps';
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, Alert, Platform } from "react-native";
+import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomButton from "../components/CustomButton";
+import { useSelector } from "react-redux";
+
+const SCHOOL_COORDS = {
+  latitude: -27.61830207733236, // coloque a latitude da sua escola
+  longitude: -48.66267179543369, // coloque a longitude da sua escola
+  latitudeDelta: 0.005,
+  longitudeDelta: 0.005,
+};
+
+// Calcula distância entre duas coordenadas em metros
+function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
+  const R = 6371e3;
+  const toRad = (x) => (x * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c;
+  return d;
+}
 
 export default function LocationScreen({ navigation }) {
-  const [isInAllowedRegion, setIsInAllowedRegionLocal] = useState(false);
-  const [alreadyVerified, setAlreadyVerified] = useState(false);
   const [location, setLocation] = useState(null);
+  const [isInAllowedRegion, setIsInAllowedRegion] = useState(false);
+  const [alreadyVerified, setAlreadyVerified] = useState(false);
+
   const user = useSelector((state) => state.auth.user);
   const alunoId = user?.id;
 
-  // Coordenadas da escola (exemplo: Av. Paulista, SP)
-  const SCHOOL_COORDS = {
-    latitude: -27.618327701815303,
-    longitude: -48.662651007546586,
-    latitudeDelta: 0.005,
-    longitudeDelta: 0.005,
-  };
-
-
+  // Checa se já verificou
   useEffect(() => {
     const checkStoredVerification = async () => {
       if (!alunoId) return;
       const value = await AsyncStorage.getItem(`hasVerifiedLocation_${alunoId}`);
       if (value === "true") {
-        setIsInAllowedRegionLocal(true);
+        setIsInAllowedRegion(true);
         setAlreadyVerified(true);
       }
     };
     checkStoredVerification();
   }, [alunoId]);
-  
+
   const checkLocation = async () => {
     if (alreadyVerified) {
       Alert.alert("Aviso", "Você já verificou sua localização.");
@@ -41,26 +58,41 @@ export default function LocationScreen({ navigation }) {
     }
 
     try {
-      if (Platform.OS !== 'web') {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert('Permissão de localização negada');
+      let currentCoords;
+
+      if (Platform.OS !== "web") {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("Permissão de localização negada");
           return;
         }
-        let current = await Location.getCurrentPositionAsync({});
-        setLocation(current.coords);
+        const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+        currentCoords = loc.coords;
+      } else {
+        // Para testes no web ou emulador sem GPS real
+        currentCoords = { latitude: -27.618302077332366, longitude: -48.66267179543369 };
+      }
 
-        // Aqui você poderia calcular distância até a escola
-        // Exemplo simples: marcar como válido sempre que localização obtida
+      setLocation(currentCoords);
+
+      const distance = getDistanceFromLatLonInMeters(
+        currentCoords.latitude,
+        currentCoords.longitude,
+        SCHOOL_COORDS.latitude,
+        SCHOOL_COORDS.longitude
+      );
+
+      if (distance <= 100) {
         await AsyncStorage.setItem(`hasVerifiedLocation_${alunoId}`, "true");
+        setIsInAllowedRegion(true);
         setAlreadyVerified(true);
-        setIsInAllowedRegionLocal(true);
-
-        Alert.alert('Localização verificada', 'Você está na região permitida!');
+        Alert.alert("Localização verificada", "Você está dentro de 100 metros da escola!");
+      } else {
+        Alert.alert("Fora da escola", "Você precisa estar mais próximo da escola para receber o ticket.");
       }
     } catch (error) {
-      console.error('Erro ao obter localização:', error);
-      Alert.alert('Erro', 'Não foi possível verificar sua localização');
+      console.error(error);
+      Alert.alert("Erro", "Não foi possível obter sua localização.");
     }
   };
 
@@ -68,7 +100,6 @@ export default function LocationScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>Verificação de Localização</Text>
 
-      {/* Exibe o mapa */}
       <MapView
         style={styles.map}
         initialRegion={SCHOOL_COORDS}
@@ -83,15 +114,14 @@ export default function LocationScreen({ navigation }) {
             : SCHOOL_COORDS
         }
       >
-        {/* Marker da escola */}
+        {/* Pino da escola */}
         <Marker
           coordinate={{ latitude: SCHOOL_COORDS.latitude, longitude: SCHOOL_COORDS.longitude }}
           title="Escola"
-          description="Local permitido"
           pinColor="green"
         />
 
-        {/* Marker do aluno */}
+        {/* Pino do aluno */}
         {location && (
           <Marker
             coordinate={{ latitude: location.latitude, longitude: location.longitude }}
@@ -102,21 +132,15 @@ export default function LocationScreen({ navigation }) {
       </MapView>
 
       <CustomButton
-        title={isInAllowedRegion ? '✅ Na Escola' : 'Verificar Localização'}
-        style={[styles.locationButton, isInAllowedRegion && styles.locationVerified]}
+        title={isInAllowedRegion ? "✅ Na Escola" : "Verificar Localização"}
         onPress={checkLocation}
-        disabled={alreadyVerified} 
+        style={[styles.locationButton, isInAllowedRegion && styles.locationVerified]}
+        disabled={alreadyVerified}
       />
-
-      <View style={styles.infoContainer}>
-        <Text style={styles.infoText}>• É necessário estar na escola para receber tickets</Text>
-        <Text style={styles.infoText}>• A localização é verificada automaticamente</Text>
-        <Text style={styles.infoText}>• Permissão de localização é obrigatória</Text>
-      </View>
 
       <CustomButton
         title="Voltar"
-        onPress={()=> navigation.navigate("Home", { refreshLocation: true })}
+        onPress={() => navigation.navigate("Home", { refreshLocation: true })}
         style={styles.validationButton}
       />
     </View>
@@ -124,12 +148,10 @@ export default function LocationScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 10, backgroundColor: "#fff" },
+  container: { flex: 1, padding: 10 },
   title: { fontSize: 20, fontWeight: "bold", marginBottom: 10, textAlign: "center" },
-  map: { width: "100%", height: 300, marginBottom: 15, borderRadius: 10, marginTop: 15},
-  locationButton: { marginTop: 10 },
-  locationVerified: { backgroundColor: "green" },
-  infoContainer: { marginTop: 20 },
-  infoText: { fontSize: 14, marginBottom: 5 },
-  validationButton: { marginTop: 15 },
+  map: { flex: 1, marginVertical: 10 },
+  locationButton: { marginVertical: 10 },
+  locationVerified: { backgroundColor: "#4CAF50" },
+  validationButton: { marginVertical: 10 },
 });
