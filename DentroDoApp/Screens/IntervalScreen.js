@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import CustomButton from '../components/CustomButton';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const IntervalScreen = ({ navigation }) => {
   // Horários de exemplo
-  const INTERVAL_START = { hour: 9, minute: 20 };
-  const INTERVAL_END = { hour: 9, minute: 35 };
+  const INTERVAL_START = { hour: 11, minute: 30 };
+  const INTERVAL_END = { hour: 11, minute: 45 };
 
   const [timeLeft, setTimeLeft] = useState('');
   const [status, setStatus] = useState('inativo'); // "inativo", "ativo", "encerrado"
@@ -61,6 +62,10 @@ const IntervalScreen = ({ navigation }) => {
   }, []);
 
   return (
+    <LinearGradient
+    colors={['#4c669f', '#3b5998', '#192f6a']}
+    style={styles.gradientBackground}
+    >
     <View style={styles.container}>
       <View style={styles.containerText}>
         <Text style={styles.title}>Controle de Intervalo</Text>
@@ -83,87 +88,76 @@ const IntervalScreen = ({ navigation }) => {
         </Text>
       </View>
 
-      <View style={styles.separator} />
-
-      <Text style={styles.titleScreens}>Outras Telas</Text>
       <CustomButton
         title="Validar Ticket"
         style={styles.validationButton}
         onPress={() => navigation.navigate('Validation')}
       />
-      <CustomButton title="Ver Localização" style={styles.localizationButton} />
+      <CustomButton title="Ver Localização" 
+      style={styles.localizationButton} 
+      onPress= {()=> navigation.navigate('Location')}
+      
+      />
       <CustomButton
         title="Voltar para Tela Inicial"
         style={styles.intervaloButton}
         onPress={() => navigation.navigate('Home')}
       />
     </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  gradientBackground: {
     flex: 1,
+    padding: 20,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 	'#FFE4E1',
   },
   containerText: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 	'#E9967A',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 50,
+    marginBottom: 30,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 30,
+    borderRadius: 10,
   },
   title: {
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  titleScreens: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  status: {
-    fontSize: 22,
+    color: '#fff',
     marginBottom: 10,
   },
+  status: {
+    fontSize: 18,
+    color: '#fff',
+    marginBottom: 5,
+  },
   time: {
-    fontSize: 20,
-    marginBottom: 20,
-  },
-  validationButton: {
-    backgroundColor: '#000',
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 8,
-    width: '80%',
-    alignItems: 'center',
-  },
-  intervaloButton: {
-    backgroundColor: '#800000',
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 8,
-    width: '80%',
-    alignItems: 'center',
-  },
-  localizationButton: {
-    backgroundColor: '#00008B',
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 8,
-    width: '80%',
-    alignItems: 'center',
+    fontSize: 18,
+    color: '#fff',
   },
   separator: {
-    height: 2,             
-    width: '80%',           
-    backgroundColor: '#00008B', 
-    marginVertical: 16,    
-  }
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
+    marginVertical: 20,
+  },
+  titleScreens: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 15,
+  },
+  validationButton: {
+    marginBottom: 10,
+    backgroundColor:  '#000'
+  },
+  localizationButton: {
+    marginBottom: 10,
+    backgroundColor:  '#00008B',
+  },
+  intervaloButton: {
+    marginBottom: 10,
+    backgroundColor: '#ea4335',
+  },
 });
 
 export default IntervalScreen;

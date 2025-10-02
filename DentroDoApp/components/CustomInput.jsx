@@ -4,9 +4,9 @@ export default function CustomInput({
   value,
   onChangeText,
   placeholder,
-  multiline = false,
+  multiline = false, 
   style,
-  ...props
+  ...props 
 }) {
   return (
     <TextInput

@@ -6,6 +6,7 @@ import { View, Text, StyleSheet, Alert } from "react-native";
 import CustomButton from '../components/CustomButton';
 import CustomInput from '../components/CustomInput';
 
+
 export default function AddAlunoScreen({ navigation }) {
   const dispatch = useDispatch();
   const [nome, setNome] = useState("");
@@ -56,6 +57,7 @@ export default function AddAlunoScreen({ navigation }) {
   };
 
   return (
+
     <View style={styles.container}>
       <Text style={styles.titleScreens}>Vai Cadastrar Aluno?</Text>
 
@@ -118,9 +120,11 @@ const styles = StyleSheet.create({
         marginTop: 20,
         marginBottom: 10,
         width: '90%',
+        borderColor: '#5F9EA0',
+        borderWidth: 2
       },
       locationButton: {
-        backgroundColor: '#D02090',
+        backgroundColor: '#32CD32',
         padding: 15,
         borderRadius: 8,
         width: '80%',

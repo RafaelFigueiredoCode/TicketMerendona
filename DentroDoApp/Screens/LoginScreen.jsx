@@ -1,6 +1,6 @@
 import { useState, useEffect} from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { View, TextInput, Button, Alert, StyleSheet } from "react-native";
+import { View, TextInput, Button, Alert, StyleSheet, Text} from "react-native";
 import users from "../Users/users";
 import { loginSuccess } from "../features/GlobalSave";
 import { loadAlunos } from "../features/AlunosSlice";
@@ -56,6 +56,7 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style= {styles.container}>
+      <Text style={styles.title}> Login </Text>
       <TextInput
         placeholder="Matrícula"
         value={matricula}
@@ -80,12 +81,14 @@ export default function LoginScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", padding: 20 },
-  title: { fontSize: 26, marginBottom: 25, textAlign: "center" },
+  title: { fontSize: 24, marginBottom: 25, textAlign: "center", fontWeight: 'bold' },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     padding: 12,
     marginBottom: 15,
     borderRadius: 8,
+    borderColor: '#B0E0E6',
+    fontWeight: 'bold'
   },
 });

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { View, Text, StyleSheet, Alert} from "react-native";
 import CustomButton from '../components/CustomButton';
 import CustomInput from '../components/CustomInput';
+import { LinearGradient } from "expo-linear-gradient";
+
 
 
 
@@ -20,101 +22,91 @@ export default function AdminScreen({navigation}) {
   };
 
   return (
-     <View style={styles.container}>
-      <Text style={styles.titleScreens}>Vai adicionar um Aluno?</Text>
-      <CustomButton
-      title="Tela de Adicionar"
-      style={styles.locationButton}
-      onPress={() => navigation.navigate("AddScreen")}
-      />
-
-      
-      <Text style={styles.titleScreens}>Quer Visualizar Aluno?</Text>
-      <CustomInput
-        placeholder="Digite a matrícula"
-        value={matriculaFind}
-        onChangeText={setMatriculaFind}
-        style={styles.matriculeInput}
-      />
-      <CustomButton 
-      title="Pesquisar" 
-      onPress={handlePesquisar} 
-      style={styles.matriculeButton}
-      />
-
-      {resultado ? (
-        <View style={{ marginTop: 20 }}>
-          <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-            Aluno encontrado:
-          </Text>
-          <Text>Nome: {resultado.nome}</Text>
-          <Text>Matrícula: {resultado.matricula}</Text>
-          <Text>CPF: {resultado.cpf}</Text>
-        </View>
-      ) : (
-        matriculaFind !== "" && (
-          <Text style={{ marginTop: 20, color: "red" }}>
-            Nenhum aluno encontrado
-          </Text>
-        )
-      )}
-      <CustomButton 
-      title="Deletar Tickets" 
-      onPress={clearTickets} 
-      style={styles.matriculeButton}
-      />
-    </View>
+    <LinearGradient
+      colors={["#FFF5E1", "#FFE4B5", "#FFFFFF"]} 
+      style={styles.gradient}
+    >
+      <View style={styles.container}>
+        <Text style={styles.titleScreens}>Vai adicionar um Aluno?</Text>
+  
+        <CustomButton
+          title="Tela de Adicionar"
+          style={styles.locationButton}
+          onPress={() => navigation.navigate("AddScreen")}
+        />
+  
+        <Text style={styles.titleScreens}>Quer Visualizar Aluno?</Text>
+        <CustomInput
+          placeholder="Digite a matrícula"
+          value={matriculaFind}
+          onChangeText={setMatriculaFind}
+          style={styles.matriculeInput}
+        />
+  
+        <CustomButton 
+          title="Pesquisar" 
+          onPress={handlePesquisar} 
+          style={styles.matriculeButton}
+        />
+  
+        {resultado ? (
+          <View style={{ marginTop: 20 }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+              Aluno encontrado:
+            </Text>
+            <Text style={{ fontSize: 16}}>Nome: {resultado.nome}</Text>
+            <Text style={{ fontSize: 16}}>Matrícula: {resultado.matricula}</Text>
+            <Text style={{ fontSize: 16, marginBottom: 20}}>CPF: {resultado.cpf}</Text>
+          </View>
+        ) : (
+          matriculaFind !== "" && (
+            <Text style={{ marginTop: 20, color: "red", marginBottom: 20 }}>
+              Nenhum aluno encontrado
+            </Text>
+          )
+        )}
+  
+        <CustomButton 
+          title="Deletar Tickets" 
+          onPress={clearTickets} 
+          style={styles.matriculeButton}
+        />
+      </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 	'#FFE4E1',
-    },
-    locationButton: {
-        backgroundColor: '#D02090',
-        padding: 15,
-        borderRadius: 8,
-        width: '80%',
-        alignItems: 'center',
-      },
-      list: {
-        flex: 1,
-      },
-      containerText: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 	'#E9967A',
-        borderRadius: 20,
-        padding: 20,
-        marginBottom: 50,
-      },
-      matriculeButton: {
-        backgroundColor: '#FF6347',
-        padding: 15,
-        borderRadius: 8,
-        width: '80%',
-        alignItems: 'center',
-      },
-      matriculeInput: {
-        borderRadius: 6,
-        marginTop: 20,
-        marginBottom: 10,
-        width: '90%',
-      },
-      alunoInput: {
-        borderRadius: 6,
-        marginTop: 20,
-        marginBottom: 10,
-        width: '90%',
-      },
-      titleScreens: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        marginBottom: 5,
-        marginTop: 20,
-      },
-})
+gradient: {
+  flex: 1,
+},
+container: {
+  flex: 1,
+  padding: 20,
+  justifyContent: "center",
+},
+titleScreens: {
+  fontSize: 24,
+  fontWeight: "bold",
+  marginBottom: 10,
+  marginTop: 20,
+  color: "#000", // contraste no fundo laranja
+  textAlign: "center",
+},
+matriculeInput: {
+  backgroundColor: "#fff",
+  borderRadius: 8,
+  padding: 10,
+  marginVertical: 10,
+  borderColor: '#5F9EA0',
+  borderWidth: 2
+},
+matriculeButton: {
+  marginVertical: 10,
+  backgroundColor: '#1E90FF'
+},
+locationButton: {
+  marginVertical: 10,
+  backgroundColor: '#008B8B'
+},
+});

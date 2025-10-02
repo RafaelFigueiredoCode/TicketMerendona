@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomButton from '../components/CustomButton';
 import { saveTicket, getTicketsByAluno } from "../features/TicketsSlice";
 import { useFocusEffect } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function TicketScreen({ navigation }) {
   const [ticketReceived, setTicketReceived] = useState(false);
@@ -16,8 +17,8 @@ export default function TicketScreen({ navigation }) {
   const user = useSelector(state => state.auth.user);
   const alunoId = user?.id;
 
-  const INTERVAL_START = { hour: 9, minute: 20 };
-  const INTERVAL_END = { hour: 9, minute: 35 };
+  const INTERVAL_START = { hour: 11, minute: 26 };
+  const INTERVAL_END = { hour: 11, minute: 41 };
 
   useFocusEffect(
     useCallback(() => {
@@ -108,6 +109,10 @@ export default function TicketScreen({ navigation }) {
   };
 
   return (
+    <LinearGradient 
+    colors={['#FF6347', '#FFE4E1', '#FA8072']} 
+    style={{ flex: 1 }}
+    >
     <View style={styles.container}>
       <Text style={styles.title}>Controle de Tickets de Refeição</Text>
 
@@ -150,9 +155,6 @@ export default function TicketScreen({ navigation }) {
         <Text style={styles.infoText}>• Disponível apenas 5 minutos antes do intervalo</Text>
         <Text style={styles.infoText}>• É necessário estar na escola</Text>
       </View>
-      <View style={styles.separator} />
-
-      <Text style={styles.titleScreens}>Outras Telas</Text>
       <CustomButton
         title='Validar Ticket'
         style={styles.validationButton}
@@ -169,6 +171,7 @@ export default function TicketScreen({ navigation }) {
         onPress={() => navigation.navigate('Location')}
       />
     </View>
+    </LinearGradient>
   );
 }
 
@@ -178,7 +181,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFE4E1',
     padding: 20,
   },
   title: {
@@ -266,7 +268,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   intervaloButton: {
-    backgroundColor: '#800000',
+    backgroundColor: '#ea4335',
     padding: 15,
     marginBottom: 15,
     borderRadius: 8,
@@ -274,18 +276,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   localizationButton: {
-    backgroundColor: '#00008B',
+    backgroundColor:  '#00008B',
     padding: 15,
     marginBottom: 15,
     borderRadius: 8,
     width: '80%',
     alignItems: 'center',
   },
-  separator: {
-    height: 2,             
-    width: '80%',           
-    backgroundColor: '#00008B', 
-    marginVertical: 16,    
-  }
 });
 

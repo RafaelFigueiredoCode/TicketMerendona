@@ -5,6 +5,7 @@ import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomButton from "../components/CustomButton";
 import { useSelector } from "react-redux";
+import { LinearGradient } from 'expo-linear-gradient';
 
 const SCHOOL_COORDS = {
   latitude: -27.61830207733236, // coloque a latitude da sua escola
@@ -97,61 +98,107 @@ export default function LocationScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Verificação de Localização</Text>
-
-      <MapView
-        style={styles.map}
-        initialRegion={SCHOOL_COORDS}
-        region={
-          location
-            ? {
-                latitude: location.latitude,
-                longitude: location.longitude,
-                latitudeDelta: 0.005,
-                longitudeDelta: 0.005,
-              }
-            : SCHOOL_COORDS
-        }
-      >
-        {/* Pino da escola */}
-        <Marker
-          coordinate={{ latitude: SCHOOL_COORDS.latitude, longitude: SCHOOL_COORDS.longitude }}
-          title="Escola"
-          pinColor="green"
-        />
-
-        {/* Pino do aluno */}
-        {location && (
+    <LinearGradient 
+      colors={['#2F4F4F', '#B0C4DE']} 
+      style={styles.gradient}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>Verificação de Localização</Text>
+        <View
+        style={styles.mapContainer}
+        >
+        <MapView
+          style={styles.map}
+          initialRegion={SCHOOL_COORDS}
+          region={
+            location
+              ? {
+                  latitude: location.latitude,
+                  longitude: location.longitude,
+                  latitudeDelta: 0.005,
+                  longitudeDelta: 0.005,
+                }
+              : SCHOOL_COORDS
+          }
+        >
+          {/* Pino da escola */}
           <Marker
-            coordinate={{ latitude: location.latitude, longitude: location.longitude }}
-            title="Você está aqui"
-            pinColor="blue"
+            coordinate={{ latitude: SCHOOL_COORDS.latitude, longitude: SCHOOL_COORDS.longitude }}
+            title="Escola"
+            pinColor="green"
           />
-        )}
-      </MapView>
-
-      <CustomButton
-        title={isInAllowedRegion ? "✅ Na Escola" : "Verificar Localização"}
-        onPress={checkLocation}
-        style={[styles.locationButton, isInAllowedRegion && styles.locationVerified]}
-        disabled={alreadyVerified}
-      />
-
-      <CustomButton
-        title="Voltar"
-        onPress={() => navigation.navigate("Home", { refreshLocation: true })}
-        style={styles.validationButton}
-      />
-    </View>
+  
+          {/* Pino do aluno */}
+          {location && (
+            <Marker
+              coordinate={{ latitude: location.latitude, longitude: location.longitude }}
+              title="Você está aqui"
+              pinColor="blue"
+            />
+          )}
+        </MapView>
+        </View>
+  
+        <CustomButton
+          title={isInAllowedRegion ? "✅ Na Escola" : "Verificar Localização"}
+          onPress={checkLocation}
+          style={[styles.locationButton, isInAllowedRegion && styles.locationVerified]}
+          disabled={alreadyVerified}
+        />
+  
+        <CustomButton
+          title="Voltar"
+          onPress={() => navigation.navigate("Home", { refreshLocation: true })}
+          style={styles.validationButton}
+        />
+      </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 10 },
-  title: { fontSize: 20, fontWeight: "bold", marginBottom: 10, textAlign: "center" },
-  map: { flex: 1, marginVertical: 10 },
-  locationButton: { marginVertical: 10 },
-  locationVerified: { backgroundColor: "#4CAF50" },
-  validationButton: { marginVertical: 10 },
+  gradient: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+    padding: 10,
+    justifyContent: 'center'
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+    color: "#fff",
+  },
+  mapContainer: {
+    height: 400,
+    marginVertical: 10,
+    borderRadius: 10,
+    overflow: 'hidden', 
+    justifyContent: 'center',
+  },
+  map: {
+    flex: 1,
+  },
+  locationButton: {
+    marginVertical: 10,
+    backgroundColor: '#f39c12',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  locationVerified: {
+    backgroundColor: "#4CAF50",
+  },
+  validationButton: {
+    marginVertical: 10,
+    backgroundColor: '#e74c3c',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
 });

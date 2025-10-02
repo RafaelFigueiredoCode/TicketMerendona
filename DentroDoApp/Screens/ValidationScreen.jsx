@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Alert } from 'react-native';
 import { useSelector } from 'react-redux';
 import CustomButton from '../components/CustomButton';
 import { getTicketsByAluno, validateTicket } from '../features/TicketsSlice';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function ValidationScreen({ navigation }) {
   const [tickets, setTickets] = useState([]);
@@ -46,106 +47,111 @@ export default function ValidationScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      {currentTicket ? (
-        <>
-        <Text style= {styles.ticketText}>Aluno: {alunoName}</Text>
-          <Text style={styles.ticketText}>Ticket: {currentTicket.data}</Text>
-          <Text style={[styles.statusText, currentTicket.status === "ativo" ? styles.active : styles.inactive]}>
-            Status: {currentTicket.status === "ativo" ? "Disponível" : "Indisponível"}
-          </Text>
-          <CustomButton title="Validar" onPress={validateTicketHandler} style={styles.validateButton}/>
-        </>
-      ) : (
-        <Text style={styles.noTicketText}>Nenhum ticket disponível</Text>
-      )}
-      <View style={styles.separator} />
-      <Text style={styles.titleScreens}>Outras Telas</Text>   
-      <CustomButton 
-        title = 'Ver Intervalo'
-        style= {styles.intervaloButton}
-        onPress={() => navigation.navigate("Interval")}
-      />
-      <CustomButton 
-        title = 'Ver Localização'
-        style= {styles.localizationButton}
-      />
-      <CustomButton 
-        title="Voltar para Tela Inicial"
-        onPress={() => navigation.navigate("Home")}
-        style= {styles.validationButton}
-      />
-    </View>
+    <LinearGradient 
+      colors={['#8A2BE2', '#9B30FF', '#DA70D6']} 
+      style={{ flex: 1 }}
+    >
+      <View style={styles.container}>
+        {currentTicket ? (
+          <>
+            <Text style={styles.ticketText}>Aluno: {alunoName}</Text>
+            <Text style={styles.ticketText}>Ticket: {currentTicket.data}</Text>
+            <Text
+              style={[
+                styles.statusText,
+                currentTicket.status === 'ativo' ? styles.active : styles.inactive,
+              ]}
+            >
+              Status: {currentTicket.status === 'ativo' ? 'Disponível' : 'Indisponível'}
+            </Text>
+            <CustomButton
+              title="Validar"
+              onPress={validateTicketHandler}
+              style={styles.validateButton}
+            />
+          </>
+        ) : (
+          <Text style={styles.noTicketText}>Nenhum ticket disponível</Text>
+        )}
+<CustomButton
+  title="Ver Intervalo"
+  style={[styles.commonButton, { backgroundColor: '#ea4335' }]}
+  onPress={() => navigation.navigate("Interval")}
+/>
+<CustomButton
+  title="Ver Localização"
+  style={[styles.commonButton, { backgroundColor: '#00008B' }]}
+  onPress= {()=> navigation.navigate('Location')}
+/>
+<CustomButton
+  title="Voltar para Tela Inicial"
+  style={[styles.commonButton, { backgroundColor: '#000' }]}
+  onPress={() => navigation.navigate('Home')}
+/>
+      </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    justifyContent: "center", 
-    alignItems: "center", 
-    padding: 16,
-    backgroundColor: "#fff"
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
-  ticketText: { 
-    fontSize: 22, 
-    fontWeight: "bold", 
-    marginBottom: 8 
-},
-  statusText: { 
-    fontSize: 18, 
-    marginBottom: 16 
-},
-  active: { 
-    color: "green" 
-},
-  inactive: { 
-    color: "red" 
-},
-  validateButton: { 
-    width: 200, marginBottom: 20 
-},
-  backButton: { 
-    width: 200, marginTop: 40
-},
-  noTicketText: { 
-    fontSize: 18, 
-    color: "gray", 
-    marginBottom: 20 
-},
-titleScreens: {
-    fontSize: 28,
+  ticketText: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  statusText: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 15,
+  },
+  active: {
+    color: '#34a853', // verde para ativo
+  },
+  inactive: {
+    color: '#ea4335', // vermelho para inativo
+  },
+  noTicketText: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    fontStyle: 'italic',
+    marginBottom: 80,
+  },
+  commonButton: {
+    width: 350,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  titleScreens: {
+    fontSize: 22,
     fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 15,
+  },
+  validateButton: {
+    backgroundColor: '#34a853', // verde botão validar
+    paddingVertical: 12,
+    borderRadius: 8,
     marginBottom: 20,
-  },
-localizationButton: {
-    backgroundColor: '#00008B',
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 8,
-    width: '80%',
-    alignItems: 'center',
-  },
-  intervaloButton: {
-    backgroundColor: '#800000',
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 8,
-    width: '80%',
-    alignItems: 'center',
+    width: 350
   },
   validationButton: {
-    backgroundColor: '#000',
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 8,
-    width: '80%',
-    alignItems: 'center',
+    marginBottom: 10,
+    backgroundColor:  '#000'
   },
-separator: {
-    height: 1,             
-    width: '80%',           
-    backgroundColor: '#ccc', 
-    marginVertical: 16,    
-  }
+  localizationButton: {
+    marginBottom: 10,
+    backgroundColor:  '#00008B',
+  },
+  intervaloButton: {
+    marginBottom: 10,
+    backgroundColor: '#ea4335',
+  },
 });
